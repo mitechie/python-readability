@@ -16,7 +16,12 @@ class UrlFetch():
     """
 
     def urlread(self, url):
-        return urllib2.urlopen(url).read()
+        headers = {
+                'User-Agent': 'lxml-readability',
+                'Accept-Encoding': 'identity'
+                }
+        request = urllib2.Request(url, headers = headers)
+        return urllib2.urlopen(request).read()
 
 class MockUrlFetch(UrlFetch):
 
