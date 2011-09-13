@@ -827,16 +827,22 @@ def parse_args():
 def check_options(options):
     return options.file or options.url
 
-def file_from_options(options):
+def input_from_options(options):
     if options.url:
-        import urllib
+        fetcher = urlfetch.UrlFetch()
         try:
-            return urllib.urlopen(options.url), options.url, None
+            input = fetcher.urlread(options.url)
+            return input, options.url, None
         except IOError as e:
             err = 'Failed to open \'%s\' with error:\n%s' % (options.url, e)
             return None, None, err
     elif options.file:
-        return open(options.file), None, None
+        try:
+            input = open(options.file).read()
+            return input, None, None
+        except IOError as e:
+            err = 'Failed to open \'%s\' with error:\n%s' % (options.file, e)
+            return None, None, err
     else:
         raise Exception('either file or url must be set')
 
@@ -890,13 +896,13 @@ def show_results(options, doc):
     else:
         print doc.summary().html
 
-def make_doc(file, url, options):
+def make_doc(input, url, options):
     doc_options = {
             'debug': options.verbose
             }
     if url:
         doc_options['url'] = url
-    return Document(file.read(), **doc_options)
+    return Document(input, **doc_options)
 
 def setup_logging(options):
     if options.verbose:
@@ -910,11 +916,11 @@ def readability_main():
     if not check_options(options):
         parser.print_help()
         sys.exit(1)
-    file, url, err = file_from_options(options)
-    if not file:
+    input, url, err = input_from_options(options)
+    if not input:
         print err
         sys.exit(1)
-    doc = make_doc(file, url, options)
+    doc = make_doc(input, url, options)
     show_results(options, doc)
 
 def main():
