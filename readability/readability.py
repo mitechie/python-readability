@@ -691,6 +691,37 @@ class Document:
     RETRY_LENGTH = 250
 
     def __init__(self, input, **options):
+        """
+        Constructs a Document that represents an input for which we try to
+        construct a readable version.
+
+        input
+            A string containing the HTML input for which we try to construct a
+            readable version.
+
+        options
+            Keyword option arguments for controlling the behavior of the
+            readabiltiy algorithm.  All options are optional.
+        
+            options['min_text_length']
+                The minimum text length of an element to be considered as part
+                of the article.
+
+            options['retry_length']
+                The algorithm may perform a second, more lenient, pass, if the
+                resulting article after the first pass is too short.  This
+                option specifies the length below which a second pass is tried.
+
+            options['url']
+                If the input came from an URL, this option should be populated
+                with that URL.
+
+            options['urlfetch']
+                The readability.UrlFetch to use for fetching subsequent data
+                when running the readability algorithm.  For example, to
+                construct a readable version of multi-page documents,
+                subsequent pages need to be fetched.
+        """
         self.input = input
         self.options = defaultdict(lambda: None)
 
