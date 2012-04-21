@@ -1,11 +1,13 @@
 import logging
 import re
+import unittest
 
 from lxml.html import document_fromstring
 from lxml.html import HTMLParser
 from lxml.html import tostring
 
 from cleaners import clean_attributes
+from cleaners import html_cleaner
 from cleaners import normalize_spaces
 from encoding import get_encoding
 
@@ -59,9 +61,13 @@ def norm_title(title):
 
 
 def get_title(doc):
-    title = doc.find('.//title').text
-    if not title:
-        return '[no-title]'
+    titleElem = doc.find('.//title')
+    if titleElem is None:
+        return ''
+
+    title = titleElem.text
+    if title is None:
+        return ''
 
     return norm_title(title)
 
@@ -74,12 +80,11 @@ def add_match(collection, text, orig):
 
 
 def shorten_title(doc):
-    title = doc.find('.//title').text
-    if not title:
+    title = orig = get_title(doc)
+    if title == '':
         return ''
 
     title = orig = norm_title(title)
-
     candidates = set()
 
     for item in ['.//h1', './/h2', './/h3']:
@@ -135,3 +140,23 @@ def get_body(doc):
             raw_html,
             cleaned))
         return raw_html
+
+def tags(node, *tag_names):
+    for tag_name in tag_names:
+        for e in node.findall('.//%s' % tag_name):
+            yield e
+
+def clean(text):
+    text = re.sub('\s*\n\s*', '\n', text)
+    text = re.sub('[ \t]{2,}', ' ', text)
+    return text.strip()
+
+def parse(input, url):
+    logging.debug('parse url: %s', url)
+    raw_doc = build_doc(input)
+    doc = html_cleaner.clean_html(raw_doc)
+    if url:
+        doc.make_links_absolute(url, resolve_base_href=True)
+    else:
+        doc.resolve_base_href()
+    return doc

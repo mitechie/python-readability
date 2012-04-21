@@ -41,5 +41,4 @@ setup(
         'console_scripts':
             ['readability=readability_lxml:client.main']
     },
-
 )

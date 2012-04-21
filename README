@@ -1,0 +1,33 @@
+This code is under the Apache License 2.0.  http://www.apache.org/licenses/LICENSE-2.0
+
+This is a python port of a ruby port of arc90's readability project
+
+http://lab.arc90.com/experiments/readability/
+
+In few words,
+Given a html document, it pulls out the main body text and cleans it up.
+It also can clean up title based on latest readability.js code.
+
+Based on:
+ - Latest readability.js ( https://github.com/MHordecki/readability-redux/blob/master/readability/readability.js )
+ - Ruby port by starrhorne and iterationlabs
+ - Python port by gfxmonk ( https://github.com/gfxmonk/python-readability , based on BeautifulSoup )
+ - Decruft effort to move to lxml ( http://www.minvolai.com/blog/decruft-arc90s-readability-in-python/ )
+
+Usage:
+
+    import urllib
+    html = urllib.urlopen(url).read()
+    readable_article = Document(html).summary()
+    readable_title = Document(html).short_title()
+
+
+
+
+***
+Known Issues
+
+wget and parsing of wget is not as reliable as it should be.  wget sometimes
+fails because the names of the local files that it tries create are too long,
+so we end up with no local copy of necessary files.  The parsing is also not
+that robust, so create incorrect mappings in the generated URL map.
